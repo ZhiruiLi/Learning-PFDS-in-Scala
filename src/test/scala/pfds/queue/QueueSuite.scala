@@ -48,13 +48,13 @@ trait QueueSuite extends FunSuite {
 }
 
 class NormalQueueSuite extends QueueSuite {
-  val Queue = pfds.queue.normal.Queue
+  val Queue = pfds.queue.NormalQueue
 }
 
 class BankerQueueSuite extends QueueSuite {
-  val Queue = pfds.queue.banker.Queue
+  val Queue = pfds.queue.BankerQueue
 }
 
 class PhysicistQueueSuite extends QueueSuite {
-  val Queue = pfds.queue.physicist.Queue
+  val Queue = pfds.queue.PhysicistQueue
 }

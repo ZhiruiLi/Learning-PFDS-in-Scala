@@ -1,4 +1,4 @@
-package pfds
+package pfds.stream
 
 sealed trait Stream[+T] {
 
