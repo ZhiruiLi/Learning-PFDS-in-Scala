@@ -1,4 +1,4 @@
-name := "LearningPfdsInScala"
+name := "PFDS-in-Scala"
 
 version := "1.0"
 
