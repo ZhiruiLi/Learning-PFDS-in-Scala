@@ -1,4 +1,4 @@
-name := "PFDS-in-Scala"
+name := "PfdsInScala"
 
 version := "1.0"
 
