@@ -1,6 +1,6 @@
 package pfds.queue
 
-private[queue] trait BankerQueue[T] extends Queue[T] {
+private trait BankerQueue[T] extends Queue[T] {
 
   private[queue] def front: Stream[T]
   private[queue] def rear: Stream[T]

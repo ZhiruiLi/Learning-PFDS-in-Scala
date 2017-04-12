@@ -1,6 +1,6 @@
 package pfds.queue
 
-private[queue] trait NormalQueue [T] extends Queue[T] {
+private trait NormalQueue [T] extends Queue[T] {
 
     private[queue] def front: List[T]
     private[queue] def rear: List[T]

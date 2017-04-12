@@ -1,6 +1,6 @@
 package pfds.queue
 
-private[queue] trait PhysicistQueue[T] extends Queue[T] {
+private trait PhysicistQueue[T] extends Queue[T] {
 
   private[queue] def front: List[T]
   private[queue] def rear: List[T]
@@ -9,7 +9,7 @@ private[queue] trait PhysicistQueue[T] extends Queue[T] {
   private[queue] def rearLen: Int
 
   def snoc[R >: T](x: R): Queue[R] = {
-    PhysicistQueue(workingCopy, front, frontLen, (x::rear), rearLen + 1)
+    PhysicistQueue(workingCopy, front, frontLen, x::rear, rearLen + 1)
   }
 
   def tail: Queue[T] = {
