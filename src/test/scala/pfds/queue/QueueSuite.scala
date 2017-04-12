@@ -10,15 +10,11 @@ trait QueueSuite extends FunSuite {
   }
 
   test("Can't get head of a empty Queue") {
-    intercept[RuntimeException] {
-      Queue.empty.head
-    }
+    assertThrows[RuntimeException](Queue.empty.head)
   }
 
   test("Can't get tail of a empty Queue") {
-    intercept[RuntimeException] {
-      Queue.empty.tail
-    }
+    assertThrows[RuntimeException](Queue.empty.tail)
   }
 
   test("Empty queue should be empty") {
