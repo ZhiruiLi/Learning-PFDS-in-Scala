@@ -1,15 +1,15 @@
 package pfds.number
 
-trait Nat[T <: Nat[_]] {
+trait Nat[T <: Nat[T]] {
 
-  def inc: T
+  def inc: Nat[T]
 
-  def dec: T
+  def dec: Nat[T]
 
-  def +(that: T): T
+  def +(that: T): Nat[T]
 
   def toInt: Int
 }
 
-object DecreaseZeroException extends RuntimeException("Can't decrease natural number zero") { }
+object NegNatException extends RuntimeException("Natural number can't be negative") { }
 

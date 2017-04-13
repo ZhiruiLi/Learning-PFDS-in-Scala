@@ -1,10 +1,16 @@
 package pfds.number
 
-private sealed trait Digit
-private object Zero extends Digit
-private object One extends Digit
+sealed trait Digit
+object Zero extends Digit
+object One extends Digit
 
-private case class DenseRepresentation(num: List[Digit]) extends Nat[DenseRepresentation] {
+sealed trait DenseRepresentation extends Nat[DenseRepresentation] {
+
+  val num: List[Digit]
+
+  private def genDense(newNum: List[Digit]): DenseRepresentation = new DenseRepresentation {
+    val num: List[Digit] = newNum
+  }
 
   private def incDigs(digs: List[Digit]): List[Digit] = digs match {
     case Nil => List(One)
@@ -12,17 +18,16 @@ private case class DenseRepresentation(num: List[Digit]) extends Nat[DenseRepres
     case One::remain => Zero::incDigs(remain)
   }
 
-  def inc: DenseRepresentation = DenseRepresentation(incDigs(num))
+  def inc: DenseRepresentation = genDense(incDigs(num))
 
   def dec: DenseRepresentation = {
     def decDigs(digs: List[Digit]): List[Digit] = digs match {
-      case Nil => throw DecreaseZeroException
+      case Nil => throw NegNatException
       case One::remain => Zero::remain
       case Zero::remain => One::decDigs(remain)
     }
-    DenseRepresentation(decDigs(num))
+    genDense(decDigs(num))
   }
-
 
   def +(that: DenseRepresentation): DenseRepresentation = {
     def add(a: List[Digit], b: List[Digit]): List[Digit] = (a, b) match {
@@ -32,7 +37,7 @@ private case class DenseRepresentation(num: List[Digit]) extends Nat[DenseRepres
       case (a1::as, Zero::bs) => a1::add(as, bs)
       case (One::as, One::bs) => Zero::incDigs(add(as, bs))
     }
-    DenseRepresentation(add(num, that.num))
+    genDense(add(num, that.num))
   }
 
   def toInt: Int = {
@@ -45,4 +50,14 @@ private case class DenseRepresentation(num: List[Digit]) extends Nat[DenseRepres
   }
 }
 
+object DenseRepresentation {
 
+  def apply(num: Int): DenseRepresentation = {
+    def gen(num: Int, acc: DenseRepresentation): DenseRepresentation = {
+      if (num == 0) acc
+      else gen(num - 1, acc.inc)
+    }
+    if (num < 0) throw NegNatException
+    else gen(num, new DenseRepresentation { val num = Nil })
+  }
+}
