@@ -12,11 +12,11 @@ sealed trait SparseRepresentation extends Nat[SparseRepresentation] {
       else throw new RuntimeException(s"Illegal carry value: $w, where current weight is: $ww");
   }
 
-  private def genSparse(n: List[Int]): SparseRepresentation = new SparseRepresentation {
+  implicit private def genSparse(n: List[Int]): SparseRepresentation = new SparseRepresentation {
     val weights: List[Int] = n
   }
 
-  override def inc: SparseRepresentation = genSparse(carry(1, weights))
+  override def inc: SparseRepresentation = carry(1, weights)
 
   override def dec: SparseRepresentation = {
     def borrow(w: Int, weights: List[Int]): List[Int] = weights match {
@@ -26,7 +26,7 @@ sealed trait SparseRepresentation extends Nat[SparseRepresentation] {
         else if (w < ww) w::borrow(w * 2, weights)
         else throw new RuntimeException(s"Illegal borrow value: $w, where current weight is: $ww");
     }
-    genSparse(borrow(1, weights))
+    borrow(1, weights)
   }
 
   override def +(that: SparseRepresentation): SparseRepresentation = {
@@ -38,7 +38,7 @@ sealed trait SparseRepresentation extends Nat[SparseRepresentation] {
         else if (w1 > w2) w2::add(ws1, remain2)
         else carry(w1 + w2, add(remain1, remain2))
     }
-    genSparse(add(weights, that.weights))
+    add(weights, that.weights)
   }
 
   override def toInt: Int = weights.sum

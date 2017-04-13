@@ -8,7 +8,7 @@ sealed trait DenseRepresentation extends Nat[DenseRepresentation] {
 
   val num: List[Digit]
 
-  private def genDense(newNum: List[Digit]): DenseRepresentation = new DenseRepresentation {
+  implicit private def genDense(newNum: List[Digit]): DenseRepresentation = new DenseRepresentation {
     val num: List[Digit] = newNum
   }
 
@@ -18,7 +18,7 @@ sealed trait DenseRepresentation extends Nat[DenseRepresentation] {
     case One::remain => Zero::incDigs(remain)
   }
 
-  override def inc: DenseRepresentation = genDense(incDigs(num))
+  override def inc: DenseRepresentation = incDigs(num)
 
   override def dec: DenseRepresentation = {
     def decDigs(digs: List[Digit]): List[Digit] = digs match {
@@ -26,7 +26,7 @@ sealed trait DenseRepresentation extends Nat[DenseRepresentation] {
       case One::remain => Zero::remain
       case Zero::remain => One::decDigs(remain)
     }
-    genDense(decDigs(num))
+    decDigs(num)
   }
 
   override def +(that: DenseRepresentation): DenseRepresentation = {
@@ -37,7 +37,7 @@ sealed trait DenseRepresentation extends Nat[DenseRepresentation] {
       case (a1::as, Zero::bs) => a1::add(as, bs)
       case (One::as, One::bs) => Zero::incDigs(add(as, bs))
     }
-    genDense(add(num, that.num))
+    add(num, that.num)
   }
 
   override def toInt: Int = {
