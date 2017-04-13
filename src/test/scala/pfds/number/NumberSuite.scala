@@ -8,8 +8,12 @@ trait NumberSuite[T <: Nat[T]] extends FunSuite {
     def apply(num: Int): T
   }
 
-  test("zero num") {
+  test("to int") {
     assert(Number(0).toInt == 0)
+    assert(Number(1).toInt == 1)
+    assert(Number(10).toInt == 10)
+    assert(Number(453).toInt == 453)
+    assertThrows[NegNatException.type](Number(-1))
   }
 
   test("increase number") {
@@ -35,6 +39,7 @@ trait NumberSuite[T <: Nat[T]] extends FunSuite {
     assert((one + two).toInt == 3)
     assert((two + one).toInt == 3)
     assert((one.inc.dec + Number(0)).toInt == 1)
+    assert((Number(12) + Number(21)).toInt == (12 + 21))
   }
 
 }
@@ -45,4 +50,8 @@ class NormalRepresentationSuite extends NumberSuite[NormalRepresentation] {
 
 class DenseRepresentationSuite extends NumberSuite[DenseRepresentation] {
   val Number = DenseRepresentation
+}
+
+class SparseRepresentationSuite extends NumberSuite[SparseRepresentation] {
+  val Number = SparseRepresentation
 }
