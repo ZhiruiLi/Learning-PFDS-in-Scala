@@ -41,7 +41,44 @@ sealed trait SegmentedRepresentation extends Nat[SegmentedRepresentation] {
     case ZerosBlock(n)::remain => OnesBlock(n) :: remain.dec
   }
 
-  def +(that: SegmentedRepresentation): SegmentedRepresentation = ???
+  def +(that: SegmentedRepresentation): SegmentedRepresentation = {
+    def add(a: List[DigitBlock], b: List[DigitBlock]): List[DigitBlock] = (a, b) match {
+      case (Nil, _) => b
+      case (_, Nil) => a
+      case (OnesBlock(i)::remain1, ZerosBlock(j)::remain2) =>
+        val m = math.min(i, j)
+        ones(m, add(ones(i - m, remain1), zeros(j - m, remain2)))
+      case (ZerosBlock(i)::remain1, OnesBlock(j)::remain2) =>
+        val m = math.min(i, j)
+        ones(m, add(zeros(i - m, remain1), ones(j - m, remain2)))
+      case (ZerosBlock(i)::remain1, ZerosBlock(j)::remain2) =>
+        val m = math.min(i, j)
+        zeros(m, add(zeros(i - m, remain1), zeros(j - m, remain2)))
+      case (OnesBlock(i)::remain1, OnesBlock(j)::remain2) =>
+        val m = math.min(i, j)
+        val tail = add(ones(i - m, remain1), ones(j - m, remain2))
+        zeros(1, ones(m - 1, tail.inc))
+    }
+    add(blocks, that.blocks)
+  }
 
-  def toInt: Int = ???
+  def toInt: Int = {
+    def convert(blocks: List[DigitBlock], pos: Int, acc: Int): Int = blocks match {
+      case Nil => acc
+      case ZerosBlock(i)::remain => convert(remain, pos + i, acc)
+      case OnesBlock(i)::remain => convert(ones(i - 1, remain), pos + 1, acc + (1 << pos))
+    }
+    convert(blocks, 0, 0)
+  }
+}
+
+object SegmentedRepresentation {
+  def apply(num: Int): SegmentedRepresentation = {
+    def gen(num: Int, acc: SegmentedRepresentation): SegmentedRepresentation = {
+      if (num == 0) acc
+      else gen(num - 1, acc.inc)
+    }
+    if (num < 0) throw NegNatException
+    else gen(num, new SegmentedRepresentation { val blocks: List[DigitBlock] = Nil })
+  }
 }

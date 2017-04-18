@@ -41,7 +41,6 @@ trait NumberSuite[T <: Nat[T]] extends FunSuite {
     assert((one.inc.dec + Number(0)).toInt == 1)
     assert((Number(12) + Number(21)).toInt == (12 + 21))
   }
-
 }
 
 class NormalRepresentationSuite extends NumberSuite[NormalRepresentation] {
@@ -54,4 +53,8 @@ class DenseRepresentationSuite extends NumberSuite[DenseRepresentation] {
 
 class SparseRepresentationSuite extends NumberSuite[SparseRepresentation] {
   val Number = SparseRepresentation
+}
+
+class SegmentedRepresentationSuite extends NumberSuite[SegmentedRepresentation] {
+  val Number = SegmentedRepresentation
 }
