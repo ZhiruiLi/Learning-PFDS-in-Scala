@@ -1,8 +1,8 @@
 package pfds.number
 
 sealed trait Digit
-object Zero extends Digit
-object One extends Digit
+case object Zero extends Digit
+case object One extends Digit
 
 sealed trait DenseRepresentation extends Nat[DenseRepresentation] {
 
