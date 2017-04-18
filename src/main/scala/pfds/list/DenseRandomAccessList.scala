@@ -16,14 +16,14 @@ class DenseRandomAccessList[+T](trees: List[Digit[T]]) extends RandomAccessList[
 
   def isEmpty: Boolean = trees.isEmpty
 
-  implicit def genList[R](trees: List[Digit[R]]): DenseRandomAccessList[R] =
+  implicit private def genList[R](trees: List[Digit[R]]): DenseRandomAccessList[R] =
     new DenseRandomAccessList[R](trees)
 
-  private[this] def linkTree[R](t1: Tree[R], t2: Tree[R]): Tree[R] = {
+  private def linkTree[R](t1: Tree[R], t2: Tree[R]): Tree[R] = {
     Branch(t1.count + t2.count, t1, t2)
   }
 
-  private[this] def insTree[R](tree: Tree[R], trees: List[Digit[R]]):
+  private def insTree[R](tree: Tree[R], trees: List[Digit[R]]):
   List[Digit[R]] = trees match {
     case Nil => List(One(tree))
     case Zero::remain => One(tree)::remain
@@ -32,8 +32,8 @@ class DenseRandomAccessList[+T](trees: List[Digit[T]]) extends RandomAccessList[
 
   def ::[R >: T](elem: R): RandomAccessList[R] = insTree(Leaf(elem), trees)
 
-  private[this] def borrowTree(trees: List[Digit[T]]):
-  (Tree[T], List[Digit[T]]) = trees match {
+  private def borrowTree[R](trees: List[Digit[R]]):
+  (Tree[R], List[Digit[R]]) = trees match {
     case Nil => throw new IndexOutOfBoundsException
     case List(One(tree)) => (tree, Nil)
     case One(tree)::remain => (tree, Zero::remain)
@@ -49,7 +49,7 @@ class DenseRandomAccessList[+T](trees: List[Digit[T]]) extends RandomAccessList[
 
   def tail: RandomAccessList[T] = borrowTree(trees)._2
 
-  private[this] def lookupTree(tree: Tree[T], idx: Int): T = tree match {
+  private def lookupTree[R](tree: Tree[R], idx: Int): R = tree match {
     case Leaf(x) if idx == 0 => x
     case Leaf(_) => throw new IndexOutOfBoundsException
     case Branch(count, l, r) =>
@@ -78,7 +78,7 @@ class DenseRandomAccessList[+T](trees: List[Digit[T]]) extends RandomAccessList[
     }
   }
 
-  private[this] def updateTree[R](tree: Tree[R], idx: Int, elem: R): Tree[R] = tree match {
+  private def updateTree[R](tree: Tree[R], idx: Int, elem: R): Tree[R] = tree match {
     case Leaf(_) if idx == 0 => Leaf(elem)
     case Leaf(_) => throw new IndexOutOfBoundsException
     case Branch(count, l, r) =>
