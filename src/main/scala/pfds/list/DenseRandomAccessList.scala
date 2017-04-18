@@ -12,9 +12,12 @@ case class Leaf[+T](elem: T) extends Tree[T] {
 }
 case class Branch[+T](count: Int, left: Tree[T], right: Tree[T]) extends Tree[T]
 
-case class DenseRandomAccessList[+T](trees: List[Digit[T]]) extends RandomAccessList[T] {
+class DenseRandomAccessList[+T](trees: List[Digit[T]]) extends RandomAccessList[T] {
 
   def isEmpty: Boolean = trees.isEmpty
+
+  implicit def genList[R](trees: List[Digit[R]]): DenseRandomAccessList[R] =
+    new DenseRandomAccessList[R](trees)
 
   private[this] def linkTree[R](t1: Tree[R], t2: Tree[R]): Tree[R] = {
     Branch(t1.count + t2.count, t1, t2)
@@ -27,8 +30,7 @@ case class DenseRandomAccessList[+T](trees: List[Digit[T]]) extends RandomAccess
     case One(tree1)::remain => Zero::insTree(linkTree(tree, tree1), remain)
   }
 
-  def ::[R >: T](elem: R): RandomAccessList[R] =
-    DenseRandomAccessList(insTree(Leaf(elem), trees))
+  def ::[R >: T](elem: R): RandomAccessList[R] = insTree(Leaf(elem), trees)
 
   private[this] def borrowTree(trees: List[Digit[T]]):
   (Tree[T], List[Digit[T]]) = trees match {
@@ -45,8 +47,7 @@ case class DenseRandomAccessList[+T](trees: List[Digit[T]]) extends RandomAccess
     x
   }
 
-  def tail: RandomAccessList[T] =
-    DenseRandomAccessList(borrowTree(trees)._2)
+  def tail: RandomAccessList[T] = borrowTree(trees)._2
 
   private[this] def lookupTree(tree: Tree[T], idx: Int): T = tree match {
     case Leaf(x) if idx == 0 => x
@@ -100,11 +101,8 @@ case class DenseRandomAccessList[+T](trees: List[Digit[T]]) extends RandomAccess
           curr::helper(remain, idx - tree.count)
         }
     }
-    if (idx < 0) {
-      throw new IndexOutOfBoundsException
-    } else {
-      DenseRandomAccessList(helper(trees, idx))
-    }
+    if (idx < 0) throw new IndexOutOfBoundsException
+    else helper(trees, idx)
   }
 
   def toPrettyString: String = {
@@ -118,8 +116,24 @@ case class DenseRandomAccessList[+T](trees: List[Digit[T]]) extends RandomAccess
     }
     "[" ++ ss.mkString(", ") ++ "]"
   }
+
+  override def equals(that: scala.Any): Boolean = that match {
+    case that1: RandomAccessList[_] if (!isEmpty) && (!that1.isEmpty) =>
+      (head == that1.head) && (tail == that1.tail)
+    case that1: RandomAccessList[_] =>
+      isEmpty && that1.isEmpty
+    case _ => super.equals(that)
+  }
 }
 
 object DenseRandomAccessList {
-  val empty = DenseRandomAccessList(Nil)
+
+  val empty: RandomAccessList[Nothing] = new DenseRandomAccessList(Nil)
+
+  def apply[T](elems: List[T]): RandomAccessList[T] = elems match {
+    case Nil => empty
+    case e::remain => e::apply(remain)
+  }
+
+  def apply[T](elems: T*): RandomAccessList[T] = apply(elems.toList)
 }
