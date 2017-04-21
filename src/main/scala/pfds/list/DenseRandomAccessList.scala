@@ -12,7 +12,7 @@ case class Leaf[+T](elem: T) extends Tree[T] {
 }
 case class Branch[+T](count: Int, left: Tree[T], right: Tree[T]) extends Tree[T]
 
-class DenseRandomAccessList[+T](trees: List[Digit[T]]) extends RandomAccessList[T] {
+final class DenseRandomAccessList[+T](trees: List[Digit[T]]) extends RandomAccessList[T] {
 
   def isEmpty: Boolean = trees.isEmpty
 
@@ -53,63 +53,54 @@ class DenseRandomAccessList[+T](trees: List[Digit[T]]) extends RandomAccessList[
     case Leaf(x) if idx == 0 => x
     case Leaf(_) => throw new IndexOutOfBoundsException
     case Branch(count, l, r) =>
-      if (idx < count / 2) {
-        lookupTree(l, idx)
-      } else {
-        lookupTree(r, idx - count / 2)
-      }
+      if (idx < count / 2) lookupTree(l, idx)
+      else lookupTree(r, idx - count / 2)
   }
 
   def apply(idx: Int): T = {
+
     def helper(trees: List[Digit[T]], idx: Int): T = trees match {
       case Nil => throw new IndexOutOfBoundsException
       case Zero::remain => helper(remain, idx)
       case One(tree)::remain =>
-        if (tree.count > idx) {
-          lookupTree(tree, idx)
-        } else {
-          helper(remain, idx - tree.count)
-        }
+        if (tree.count > idx) lookupTree(tree, idx)
+        else helper(remain, idx - tree.count)
     }
-    if (idx < 0) {
-      throw new IndexOutOfBoundsException
-    } else {
-      helper(trees, idx)
-    }
+
+    if (idx < 0) throw new IndexOutOfBoundsException
+    else helper(trees, idx)
   }
 
   private def updateTree[R](tree: Tree[R], idx: Int, elem: R): Tree[R] = tree match {
     case Leaf(_) if idx == 0 => Leaf(elem)
     case Leaf(_) => throw new IndexOutOfBoundsException
     case Branch(count, l, r) =>
-      if (idx < count / 2) {
-        Branch(count, updateTree(l, idx, elem), r)
-      } else {
-        Branch(count, l, updateTree(r, idx - count / 2, elem))
-      }
+      if (idx < count / 2) Branch(count, updateTree(l, idx, elem), r)
+      else Branch(count, l, updateTree(r, idx - count / 2, elem))
   }
 
   def updated[R >: T](idx: Int, elem: R): RandomAccessList[R] = {
+
     def helper(trees: List[Digit[R]], idx: Int):
     List[Digit[R]] = trees match {
       case Nil => throw new IndexOutOfBoundsException
       case Zero::remain => Zero::helper(remain, idx)
       case (curr@One(tree))::remain =>
-        if (tree.count > idx) {
-          One(updateTree(tree, idx, elem))::remain
-        } else {
-          curr::helper(remain, idx - tree.count)
-        }
+        if (tree.count > idx) One(updateTree(tree, idx, elem))::remain
+        else curr::helper(remain, idx - tree.count)
     }
+
     if (idx < 0) throw new IndexOutOfBoundsException
     else helper(trees, idx)
   }
 
   def toPrettyString: String = {
+
     def convertTree(tree: Tree[T]): Stream[T] = tree match {
       case Leaf(x) => Stream(x)
       case Branch(_, l, r) => convertTree(l) ++ convertTree(r)
     }
+
     val ss = trees.flatMap {
       case Zero => Stream.empty
       case One(tree) => convertTree(tree)

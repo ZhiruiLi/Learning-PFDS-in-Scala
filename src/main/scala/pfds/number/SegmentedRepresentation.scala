@@ -18,9 +18,7 @@ sealed trait SegmentedRepresentation extends Nat[SegmentedRepresentation] {
 
   private def ones(i: Int, blks: List[DigitBlock]): List[DigitBlock] = blks match {
     case OnesBlock(j)::remain => OnesBlock(i + j)::remain
-    case _ =>
-      if (i == 0) blks
-      else OnesBlock(i)::blks
+    case _ => if (i == 0) blks else OnesBlock(i)::blks
   }
 
   implicit private def genSeg(blks: List[DigitBlock]): SegmentedRepresentation = new SegmentedRepresentation {

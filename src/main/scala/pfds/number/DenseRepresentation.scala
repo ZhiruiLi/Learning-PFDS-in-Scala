@@ -8,7 +8,8 @@ sealed trait DenseRepresentation extends Nat[DenseRepresentation] {
 
   val num: List[Digit]
 
-  implicit private def genDense(newNum: List[Digit]): DenseRepresentation = new DenseRepresentation {
+  implicit private def genDense(newNum: List[Digit]):
+  DenseRepresentation = new DenseRepresentation {
     val num: List[Digit] = newNum
   }
 

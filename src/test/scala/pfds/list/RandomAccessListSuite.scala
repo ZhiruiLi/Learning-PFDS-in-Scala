@@ -32,10 +32,13 @@ trait RandomAccessListSuite extends FunSuite {
   }
 
   test("tail method fetch the tailing list of a list") {
+    assertThrows[IndexOutOfBoundsException](ListObj.empty.tail)
     val lst1 = 1::ListObj.empty
     assert(lst1.tail == ListObj.empty)
-    assert((3::2::lst1).tail.tail.tail == ListObj.empty)
-    assertThrows[IndexOutOfBoundsException](ListObj.empty.tail)
+    val lst2 = 3::2::lst1
+    assert(lst2.tail.tail.tail == ListObj.empty)
+    val lst3 = 0::1::2::3::4::5::6::ListObj.empty
+    assert(lst3.tail.tail.tail.tail == 4::5::6::ListObj.empty)
   }
 
   test("apply method fetch one element in the list associated with the given index") {
@@ -70,4 +73,8 @@ trait RandomAccessListSuite extends FunSuite {
 
 class DenseRandomAccessListSuite extends RandomAccessListSuite {
   val ListObj = DenseRandomAccessList
+}
+
+class SegmentedRandomAccessListSuite extends RandomAccessListSuite {
+  val ListObj = SegmentedRandomAccessList
 }
