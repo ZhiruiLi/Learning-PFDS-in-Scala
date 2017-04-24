@@ -58,3 +58,7 @@ class SparseRepresentationSuite extends NumberSuite[SparseRepresentation] {
 class SegmentedRepresentationSuite extends NumberSuite[SegmentedRepresentation] {
   val Number = SegmentedRepresentation
 }
+
+class SkewRepresentationSuite extends NumberSuite[SkewRepresentation] {
+  val Number = SkewRepresentation
+}
