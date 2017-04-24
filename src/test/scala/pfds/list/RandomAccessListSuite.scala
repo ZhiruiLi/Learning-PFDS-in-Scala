@@ -78,3 +78,7 @@ class DenseRandomAccessListSuite extends RandomAccessListSuite {
 class SegmentedRandomAccessListSuite extends RandomAccessListSuite {
   val ListObj = SegmentedRandomAccessList
 }
+
+class SkewRandomAccessListSuite extends RandomAccessListSuite {
+  val ListObj = SkewRandomAccessList
+}
