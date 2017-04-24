@@ -1,5 +1,7 @@
 package pfds.list
 
+import segmented._
+
 package segmented {
   sealed trait DigitBlock[+T]
   case class Zeros(num: Int) extends DigitBlock[Nothing]
@@ -14,8 +16,6 @@ package segmented {
     }
   }
 }
-
-import segmented._
 
 case class SegmentedRandomAccessList[+T](blocks: List[DigitBlock[T]])
   extends RandomAccessList[T] {

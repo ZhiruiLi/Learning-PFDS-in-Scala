@@ -1,5 +1,7 @@
 package pfds.list
 
+import dense._
+
 package dense {
   sealed trait Tree[+T] {
     def count: Int
@@ -13,8 +15,6 @@ package dense {
   case object Zero extends Digit[Nothing]
   case class One[+T](tree: Tree[T]) extends Digit[T]
 }
-
-import dense._
 
 final class DenseRandomAccessList[+T](trees: List[Digit[T]]) extends RandomAccessList[T] {
 

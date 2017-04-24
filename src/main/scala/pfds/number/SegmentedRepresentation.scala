@@ -1,12 +1,12 @@
 package pfds.number
 
+import segmented._
+
 package segmented {
   sealed trait DigitBlock
   case class Zeros(count: Int) extends DigitBlock
   case class Ones(count: Int) extends DigitBlock
 }
-
-import segmented._
 
 sealed trait SegmentedRepresentation extends Nat[SegmentedRepresentation] {
 

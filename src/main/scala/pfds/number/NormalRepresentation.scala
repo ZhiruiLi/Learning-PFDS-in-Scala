@@ -1,11 +1,11 @@
 package pfds.number
 
+import normal._
+
 package normal {
   case object Zero extends NormalRepresentation
   case class Succ(tl: NormalRepresentation) extends NormalRepresentation
 }
-
-import normal._
 
 sealed trait NormalRepresentation extends Nat[NormalRepresentation] {
 
