@@ -1,17 +1,21 @@
 package pfds.list
 
-sealed trait DigitBlock[+T]
-case class ZerosBlock(num: Int) extends DigitBlock[Nothing]
-case class OnesBlock[+T](trees: List[BinomialTree[T]]) extends DigitBlock[T]
+package segmented {
+  sealed trait DigitBlock[+T]
+  case class Zeros(num: Int) extends DigitBlock[Nothing]
+  case class Ones[+T](trees: List[BinomialTree[T]]) extends DigitBlock[T]
 
-case class BinomialTree[+T](elem: T, children: List[BinomialTree[T]] = Nil) {
-  lazy val count: Int = children.map(_.count).sum + 1
-  lazy val rank: Int = if (children.isEmpty) 1 else children.head.rank + 1
-  def merge[R >: T](that: BinomialTree[R]): BinomialTree[R] = {
-    assert(rank == that.rank)
-    copy(children = that::children)
+  case class BinomialTree[+T](elem: T, children: List[BinomialTree[T]] = Nil) {
+    lazy val count: Int = children.map(_.count).sum + 1
+    lazy val rank: Int = if (children.isEmpty) 1 else children.head.rank + 1
+    def merge[R >: T](that: BinomialTree[R]): BinomialTree[R] = {
+      assert(rank == that.rank)
+      copy(children = that::children)
+    }
   }
 }
+
+import segmented._
 
 case class SegmentedRandomAccessList[+T](blocks: List[DigitBlock[T]])
   extends RandomAccessList[T] {
@@ -23,21 +27,21 @@ case class SegmentedRandomAccessList[+T](blocks: List[DigitBlock[T]])
 
   private def zeros[R](i: Int, blks: List[DigitBlock[R]]): List[DigitBlock[R]] = blks match {
     case Nil => Nil
-    case ZerosBlock(j)::remain => ZerosBlock(i + j)::remain
-    case _ => if (i == 0) blks else ZerosBlock(i)::blks
+    case Zeros(j)::remain => Zeros(i + j)::remain
+    case _ => if (i == 0) blks else Zeros(i)::blks
   }
 
   private def ones[A, B >: A](trees: List[BinomialTree[B]], blks: List[DigitBlock[A]]):
   List[DigitBlock[B]] = blks match {
-    case OnesBlock(trees1)::remain => OnesBlock(trees ++ trees1)::remain
-    case _ => if (trees.isEmpty) blks else OnesBlock(trees)::blks
+    case Ones(trees1)::remain => Ones(trees ++ trees1)::remain
+    case _ => if (trees.isEmpty) blks else Ones(trees)::blks
   }
 
   private def insTree[R](tree: BinomialTree[R], blks: List[DigitBlock[R]]):
   List[DigitBlock[R]] = blks match {
-    case Nil => List(OnesBlock(List(tree)))
-    case ZerosBlock(i)::remain => ones(List(tree), zeros(i - 1, remain))
-    case OnesBlock(trees)::remain =>
+    case Nil => List(Ones(List(tree)))
+    case Zeros(i)::remain => ones(List(tree), zeros(i - 1, remain))
+    case Ones(trees)::remain =>
       val newTree = trees.foldLeft(tree)(_.merge(_))
       zeros(trees.length, insTree(newTree, remain))
   }
@@ -47,8 +51,8 @@ case class SegmentedRandomAccessList[+T](blocks: List[DigitBlock[T]])
   private def borrowTree[R](blks: List[DigitBlock[R]]):
   (BinomialTree[R], List[DigitBlock[R]]) = blks match {
     case Nil => throw new IndexOutOfBoundsException
-    case ZerosBlock(_)::remain => borrowTree(remain)
-    case OnesBlock(trees)::remain =>
+    case Zeros(_)::remain => borrowTree(remain)
+    case Ones(trees)::remain =>
       (trees.head, ones(trees.head.children.reverse, zeros(1, ones(trees.tail, remain))))
   }
 
@@ -79,8 +83,8 @@ case class SegmentedRandomAccessList[+T](blocks: List[DigitBlock[T]])
 
     def applyBlocks(blks: List[DigitBlock[T]], idx: Int): T = blks match {
       case Nil => throw new IndexOutOfBoundsException
-      case ZerosBlock(_)::remain => applyBlocks(remain, idx)
-      case OnesBlock(trees)::remain =>
+      case Zeros(_)::remain => applyBlocks(remain, idx)
+      case Ones(trees)::remain =>
         val count = countAll(trees)
         if (idx < count) applyTreeList(trees, idx)
         else applyBlocks(remain, idx - count)
@@ -110,10 +114,10 @@ case class SegmentedRandomAccessList[+T](blocks: List[DigitBlock[T]])
 
     def updatedBlocks(blks: List[DigitBlock[T]], idx: Int, elem: R): List[DigitBlock[R]] = blks match {
       case Nil => throw new IndexOutOfBoundsException
-      case (z@ZerosBlock(_))::remain => z::updatedBlocks(remain, idx, elem)
-      case (o@OnesBlock(trees))::remain =>
+      case (z@Zeros(_))::remain => z::updatedBlocks(remain, idx, elem)
+      case (o@Ones(trees))::remain =>
         val count = countAll(trees)
-        if (idx < count) OnesBlock(updatedTreeList(trees, idx, elem))::remain
+        if (idx < count) Ones(updatedTreeList(trees, idx, elem))::remain
         else o::updatedBlocks(remain, idx - count, elem)
     }
 

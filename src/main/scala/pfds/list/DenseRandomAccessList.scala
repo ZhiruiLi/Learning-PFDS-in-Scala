@@ -1,16 +1,20 @@
 package pfds.list
 
-sealed trait Digit[+T]
-case object Zero extends Digit[Nothing]
-case class One[+T](tree: Tree[T]) extends Digit[T]
+package dense {
+  sealed trait Tree[+T] {
+    def count: Int
+  }
+  case class Leaf[+T](elem: T) extends Tree[T] {
+    val count = 1
+  }
+  case class Branch[+T](count: Int, left: Tree[T], right: Tree[T]) extends Tree[T]
 
-sealed trait Tree[+T] {
-  def count: Int
+  sealed trait Digit[+T]
+  case object Zero extends Digit[Nothing]
+  case class One[+T](tree: Tree[T]) extends Digit[T]
 }
-case class Leaf[+T](elem: T) extends Tree[T] {
-  val count = 1
-}
-case class Branch[+T](count: Int, left: Tree[T], right: Tree[T]) extends Tree[T]
+
+import dense._
 
 final class DenseRandomAccessList[+T](trees: List[Digit[T]]) extends RandomAccessList[T] {
 

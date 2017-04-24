@@ -1,33 +1,37 @@
 package pfds.number
 
+package normal {
+  case object Zero extends NormalRepresentation
+  case class Succ(tl: NormalRepresentation) extends NormalRepresentation
+}
+
+import normal._
+
 sealed trait NormalRepresentation extends Nat[NormalRepresentation] {
 
-  override def inc: NormalRepresentation = NormalSucc(this)
+  override def inc: NormalRepresentation = Succ(this)
 
   override def dec: NormalRepresentation = this match {
-    case NormalZero => throw NegNatException
-    case NormalSucc(num) => num
+    case Zero => throw NegNatException
+    case Succ(num) => num
   }
 
   override def +(that: NormalRepresentation): NormalRepresentation = {
     def add(a: NormalRepresentation, b: NormalRepresentation): NormalRepresentation = a match {
-      case NormalZero => b
-      case NormalSucc(num) => add(num, NormalSucc(b))
+      case Zero => b
+      case Succ(num) => add(num, Succ(b))
     }
     add(this, that)
   }
 
   override def toInt: Int = {
     def convert(num: NormalRepresentation, acc: Int): Int = num match {
-      case NormalZero => acc
-      case NormalSucc(tl) => convert(tl, acc + 1)
+      case Zero => acc
+      case Succ(tl) => convert(tl, acc + 1)
     }
     convert(this, 0)
   }
 }
-
-private case object NormalZero extends NormalRepresentation
-private case class NormalSucc(tl: NormalRepresentation) extends NormalRepresentation
 
 object NormalRepresentation {
 
@@ -37,6 +41,6 @@ object NormalRepresentation {
       else gen(num - 1, acc.inc)
     }
     if (num < 0) throw NegNatException
-    else gen(num, NormalZero)
+    else gen(num, Zero)
   }
 }
