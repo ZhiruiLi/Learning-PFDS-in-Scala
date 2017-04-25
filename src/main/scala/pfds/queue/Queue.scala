@@ -7,8 +7,6 @@ trait Queue[+T] {
   // cons on the right
   def snoc[R >: T](x: R): Queue[R]
 
-  final def #::[R >: T](x: R): Queue[R] = snoc(x)
-
   def head: T
 
   def tail: Queue[T]
