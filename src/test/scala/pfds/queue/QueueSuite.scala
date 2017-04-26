@@ -40,7 +40,6 @@ trait QueueSuite extends FunSuite {
     assert(q.tail.head == 2)
     assert(q.tail.tail.head == 3)
   }
-
 }
 
 class NormalQueueSuite extends QueueSuite {
@@ -53,4 +52,8 @@ class BankerQueueSuite extends QueueSuite {
 
 class PhysicistQueueSuite extends QueueSuite {
   val Queue = pfds.queue.PhysicistQueue
+}
+
+class BootstrappedQueueSuite extends QueueSuite {
+  val Queue = pfds.queue.BootstrappedQueue
 }
